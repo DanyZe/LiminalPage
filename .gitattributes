@@ -1,0 +1,14 @@
+# Treat audio files as binary to prevent line ending conversion
+*.mp3 binary
+*.ogg binary
+*.wav binary
+*.m4a binary
+
+# Treat image files as binary
+*.jpg binary
+*.jpeg binary
+*.png binary
+*.gif binary
+*.ico binary
+*.svg binary
+*.webp binary

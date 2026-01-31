@@ -1,0 +1,44 @@
+[build]
+  command = "pnpm run build"
+  publish = "out"
+
+[build.environment]
+  NODE_VERSION = "22"
+  NETLIFY_NEXT_PLUGIN_SKIP = "true"
+
+# SPA routing - redirect to index.html only for HTML requests (not static files)
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+  conditions = {Accept = "text/html"}
+  force = false
+
+# Audio files - MP3 format with proper headers
+[[headers]]
+  for = "/sounds/*.mp3"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+    Content-Type = "audio/mpeg"
+    Accept-Ranges = "bytes"
+    Cross-Origin-Resource-Policy = "cross-origin"
+    Access-Control-Allow-Origin = "*"
+
+# Images
+[[headers]]
+  for = "/images/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Favicon
+[[headers]]
+  for = "/*.ico"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+    Content-Type = "image/x-icon"
+
+# Ensure HTML loads correctly
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
