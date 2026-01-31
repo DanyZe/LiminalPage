@@ -124,6 +124,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
         })
         .then((buf) => {
           console.log("[SFX] buffer size:", buf.byteLength, "bytes")
+          const bufForBlob = buf.slice(0)
           return ctx
             .decodeAudioData(buf)
             .then((decoded) => {
@@ -138,7 +139,8 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
             })
             .catch((decodeErr) => {
               console.warn("[SFX] decode failed, fallback to blob URL:", decodeErr?.message ?? decodeErr)
-              const blob = new Blob([buf], { type: "audio/mpeg" })
+              const blob = new Blob([bufForBlob], { type: "audio/mpeg" })
+              console.log("[SFX] blob size:", blob.size, "bytes")
               const blobUrl = URL.createObjectURL(blob)
               const audio = new Audio(blobUrl)
               audio.volume = 0.25
