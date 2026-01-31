@@ -106,13 +106,28 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
 
   const playSfx = useCallback(
     (url: string) => {
-      if (isMuted) return
+      if (isMuted) {
+        console.log("[SFX] skipped: muted")
+        return
+      }
       const ctx = sfxContextRef.current
-      if (!ctx) return
+      if (!ctx) {
+        console.warn("[SFX] no AudioContext")
+        return
+      }
+      console.log("[SFX] fetch:", url)
       fetch(url)
-        .then((r) => r.arrayBuffer())
-        .then((buf) => ctx.decodeAudioData(buf))
+        .then((r) => {
+          console.log("[SFX] response:", r.status, r.statusText, "Content-Type:", r.headers.get("Content-Type"), "Content-Length:", r.headers.get("Content-Length"))
+          if (!r.ok) throw new Error(`HTTP ${r.status} ${r.statusText}`)
+          return r.arrayBuffer()
+        })
+        .then((buf) => {
+          console.log("[SFX] buffer size:", buf.byteLength, "bytes")
+          return ctx.decodeAudioData(buf)
+        })
         .then((decoded) => {
+          console.log("[SFX] decode OK, playing, duration:", decoded.duration.toFixed(2), "s")
           const src = ctx.createBufferSource()
           const gain = ctx.createGain()
           gain.gain.value = 0.25
@@ -121,33 +136,43 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
           gain.connect(ctx.destination)
           src.start(0)
         })
-        .catch(() => {})
+        .catch((err) => {
+          console.error("[SFX] failed:", err?.message ?? err, err)
+        })
     },
     [isMuted]
   )
 
   const playEnter = useCallback(() => {
+    console.log("[SFX] playEnter called, isMuted:", isMuted)
     if (isMuted) return
     if (!sfxContextRef.current) {
       sfxContextRef.current = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)()
       sfxContextRef.current.resume()
+      console.log("[SFX] AudioContext created")
     }
     const base = getSoundsBase()
     const index = (enterIndexRef.current % 5) + 1
     enterIndexRef.current = (enterIndexRef.current + 1) % 5
-    playSfx(`${base}/sounds/enter-${index}.mp3`)
+    const url = `${base}/sounds/enter-${index}.mp3`
+    console.log("[SFX] enter URL:", url)
+    playSfx(url)
   }, [isMuted, getSoundsBase, playSfx])
 
   const playExit = useCallback(() => {
+    console.log("[SFX] playExit called, isMuted:", isMuted)
     if (isMuted) return
     if (!sfxContextRef.current) {
       sfxContextRef.current = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)()
       sfxContextRef.current.resume()
+      console.log("[SFX] AudioContext created")
     }
     const base = getSoundsBase()
     const index = (exitIndexRef.current % 5) + 1
     exitIndexRef.current = (exitIndexRef.current + 1) % 5
-    playSfx(`${base}/sounds/exit-${index}.mp3`)
+    const url = `${base}/sounds/exit-${index}.mp3`
+    console.log("[SFX] exit URL:", url)
+    playSfx(url)
   }, [isMuted, getSoundsBase, playSfx])
 
   return (
