@@ -13,6 +13,7 @@ import { ContactSection } from "./sections/ContactSection"
 interface ZoomOverlayProps {
   sectionId: string | null
   onClose: () => void
+  onPlayExit?: () => void
   originX: number
   originY: number
 }
@@ -28,6 +29,7 @@ const sectionComponents: Record<string, React.ComponentType> = {
 export function ZoomOverlay({
   sectionId,
   onClose,
+  onPlayExit,
   originX,
   originY,
 }: ZoomOverlayProps) {
@@ -49,6 +51,8 @@ export function ZoomOverlay({
   }, [sectionId])
 
   const handleClose = () => {
+    // Play exit SFX synchronously with the click so browser allows audio (user gesture)
+    onPlayExit?.()
     setIsContentVisible(false)
     setTimeout(() => {
       setIsVisible(false)

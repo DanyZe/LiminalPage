@@ -65,14 +65,16 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     ambientRef.current.volume = 0
     ambientRef.current.preload = "auto"
 
-    // Set volume to -12dB (approximately 0.25 in linear scale)
+    // Set volume to 0 for fade-in; preload so SFX are ready on first user gesture
     enterSoundsRef.current.forEach((audio) => {
-      audio.volume = 0 // Start at 0 for fade in
+      audio.volume = 0
       audio.preload = "auto"
+      audio.load()
     })
     exitSoundsRef.current.forEach((audio) => {
-      audio.volume = 0 // Start at 0 for fade in
+      audio.volume = 0
       audio.preload = "auto"
+      audio.load()
     })
 
     return () => {
