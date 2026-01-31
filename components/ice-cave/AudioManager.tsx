@@ -124,17 +124,26 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
         })
         .then((buf) => {
           console.log("[SFX] buffer size:", buf.byteLength, "bytes")
-          return ctx.decodeAudioData(buf)
-        })
-        .then((decoded) => {
-          console.log("[SFX] decode OK, playing, duration:", decoded.duration.toFixed(2), "s")
-          const src = ctx.createBufferSource()
-          const gain = ctx.createGain()
-          gain.gain.value = 0.25
-          src.buffer = decoded
-          src.connect(gain)
-          gain.connect(ctx.destination)
-          src.start(0)
+          return ctx
+            .decodeAudioData(buf)
+            .then((decoded) => {
+              console.log("[SFX] decode OK, playing, duration:", decoded.duration.toFixed(2), "s")
+              const src = ctx.createBufferSource()
+              const gain = ctx.createGain()
+              gain.gain.value = 0.25
+              src.buffer = decoded
+              src.connect(gain)
+              gain.connect(ctx.destination)
+              src.start(0)
+            })
+            .catch((decodeErr) => {
+              console.warn("[SFX] decode failed, fallback to blob URL:", decodeErr?.message ?? decodeErr)
+              const blob = new Blob([buf], { type: "audio/mpeg" })
+              const blobUrl = URL.createObjectURL(blob)
+              const audio = new Audio(blobUrl)
+              audio.volume = 0.25
+              audio.play().finally(() => URL.revokeObjectURL(blobUrl))
+            })
         })
         .catch((err) => {
           console.error("[SFX] failed:", err?.message ?? err, err)
