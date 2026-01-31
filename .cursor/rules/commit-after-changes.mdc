@@ -1,0 +1,16 @@
+---
+description: Always commit and push after making code changes
+alwaysApply: true
+---
+
+# Commit and push after changes
+
+After making code changes in this project:
+
+1. **Stage** the modified files: `git add <files>` (or `git add -A` for all changes).
+2. **Commit** with a short, descriptive message: `git commit -m "brief description"`.
+3. **Push** to the remote: `git push`.
+
+Do this at the end of the session when changes are complete, unless the user explicitly says not to commit, not to push, or to leave changes uncommitted.
+
+Use PowerShell-compatible commands (no `&&`; use `;` to chain).
