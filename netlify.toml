@@ -6,6 +6,13 @@
   NODE_VERSION = "22"
   NETLIFY_NEXT_PLUGIN_SKIP = "true"
 
+# Serve sound files directly (must come before SPA fallback so MP3s aren't rewritten to index.html)
+[[redirects]]
+  from = "/sounds/*"
+  to = "/sounds/:splat"
+  status = 200
+  force = true
+
 # SPA routing - redirect to index.html only for HTML requests (not static files)
 [[redirects]]
   from = "/*"
