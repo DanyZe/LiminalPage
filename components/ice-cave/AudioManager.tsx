@@ -42,40 +42,41 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
   const exitFadeIntervalRef = useRef<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
-    // Initialize audio elements
+    // Use full URL so paths resolve correctly (static export, basePath, etc.)
+    const base =
+      typeof window !== "undefined" ? window.location.origin : ""
+    const s = (path: string) => `${base}${path}`
+
     enterSoundsRef.current = [
-      new Audio("/sounds/enter-1.mp3"),
-      new Audio("/sounds/enter-2.mp3"),
-      new Audio("/sounds/enter-3.mp3"),
-      new Audio("/sounds/enter-4.mp3"),
-      new Audio("/sounds/enter-5.mp3"),
+      new Audio(s("/sounds/enter-1.mp3")),
+      new Audio(s("/sounds/enter-2.mp3")),
+      new Audio(s("/sounds/enter-3.mp3")),
+      new Audio(s("/sounds/enter-4.mp3")),
+      new Audio(s("/sounds/enter-5.mp3")),
     ]
-    
+
     exitSoundsRef.current = [
-      new Audio("/sounds/exit-1.mp3"),
-      new Audio("/sounds/exit-2.mp3"),
-      new Audio("/sounds/exit-3.mp3"),
-      new Audio("/sounds/exit-4.mp3"),
-      new Audio("/sounds/exit-5.mp3"),
+      new Audio(s("/sounds/exit-1.mp3")),
+      new Audio(s("/sounds/exit-2.mp3")),
+      new Audio(s("/sounds/exit-3.mp3")),
+      new Audio(s("/sounds/exit-4.mp3")),
+      new Audio(s("/sounds/exit-5.mp3")),
     ]
 
-    // Initialize ambient audio
-    ambientRef.current = new Audio("/sounds/ambient.mp3")
-    ambientRef.current.loop = true
-    ambientRef.current.volume = 0
-    ambientRef.current.preload = "auto"
-
-    // Set volume to 0 for fade-in; preload so SFX are ready on first user gesture
     enterSoundsRef.current.forEach((audio) => {
       audio.volume = 0
       audio.preload = "auto"
-      audio.load()
     })
     exitSoundsRef.current.forEach((audio) => {
       audio.volume = 0
       audio.preload = "auto"
-      audio.load()
     })
+
+    // Ambient (same URL pattern so it stays consistent)
+    ambientRef.current = new Audio(s("/sounds/ambient.mp3"))
+    ambientRef.current.loop = true
+    ambientRef.current.volume = 0
+    ambientRef.current.preload = "auto"
 
     return () => {
       // Cleanup on unmount
