@@ -28,60 +28,39 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
   const [isMuted, setIsMuted] = useState(false)
   const enterIndexRef = useRef(0)
   const exitIndexRef = useRef(0)
-  
-  // Preload all audio files
-  const enterSoundsRef = useRef<HTMLAudioElement[]>([])
-  const exitSoundsRef = useRef<HTMLAudioElement[]>([])
+
+  // One element per type (like ambient) — set src at play time so browser loads in user gesture
+  const enterSfxRef = useRef<HTMLAudioElement | null>(null)
+  const exitSfxRef = useRef<HTMLAudioElement | null>(null)
   const ambientRef = useRef<HTMLAudioElement | null>(null)
   const hasFadedInRef = useRef(false)
-  
-  // Track currently playing audio for fade out
-  const currentlyPlayingEnterRef = useRef<HTMLAudioElement | null>(null)
-  const currentlyPlayingExitRef = useRef<HTMLAudioElement | null>(null)
+
   const enterFadeIntervalRef = useRef<NodeJS.Timeout | null>(null)
   const exitFadeIntervalRef = useRef<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
-    // Use full URL so paths resolve correctly (static export, basePath, etc.)
     const base =
       typeof window !== "undefined" ? window.location.origin : ""
     const s = (path: string) => `${base}${path}`
 
-    enterSoundsRef.current = [
-      new Audio(s("/sounds/enter-1.mp3")),
-      new Audio(s("/sounds/enter-2.mp3")),
-      new Audio(s("/sounds/enter-3.mp3")),
-      new Audio(s("/sounds/enter-4.mp3")),
-      new Audio(s("/sounds/enter-5.mp3")),
-    ]
+    // Single SFX elements — no src until play (set in user gesture, like ambient’s first play)
+    enterSfxRef.current = new Audio()
+    enterSfxRef.current.volume = 0
+    exitSfxRef.current = new Audio()
+    exitSfxRef.current.volume = 0
 
-    exitSoundsRef.current = [
-      new Audio(s("/sounds/exit-1.mp3")),
-      new Audio(s("/sounds/exit-2.mp3")),
-      new Audio(s("/sounds/exit-3.mp3")),
-      new Audio(s("/sounds/exit-4.mp3")),
-      new Audio(s("/sounds/exit-5.mp3")),
-    ]
-
-    enterSoundsRef.current.forEach((audio) => {
-      audio.volume = 0
-      audio.preload = "auto"
-    })
-    exitSoundsRef.current.forEach((audio) => {
-      audio.volume = 0
-      audio.preload = "auto"
-    })
-
-    // Ambient (same URL pattern so it stays consistent)
     ambientRef.current = new Audio(s("/sounds/ambient.mp3"))
     ambientRef.current.loop = true
     ambientRef.current.volume = 0
     ambientRef.current.preload = "auto"
 
     return () => {
-      // Cleanup on unmount
       if (enterFadeIntervalRef.current) clearInterval(enterFadeIntervalRef.current)
       if (exitFadeIntervalRef.current) clearInterval(exitFadeIntervalRef.current)
+      enterSfxRef.current?.pause()
+      enterSfxRef.current = null
+      exitSfxRef.current?.pause()
+      exitSfxRef.current = null
       ambientRef.current?.pause()
       ambientRef.current = null
     }
@@ -178,61 +157,41 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   const playEnter = useCallback(() => {
-    console.log("[v0] playEnter called, isMuted:", isMuted)
     if (isMuted) return
-    
-    // Fade out currently playing enter sound if any
-    if (currentlyPlayingEnterRef.current && !currentlyPlayingEnterRef.current.paused) {
-      if (enterFadeIntervalRef.current) clearInterval(enterFadeIntervalRef.current)
-      fadeOut(currentlyPlayingEnterRef.current, 200)
-    }
-    
-    const audio = enterSoundsRef.current[enterIndexRef.current]
-    console.log("[v0] Playing enter sound index:", enterIndexRef.current, "audio:", !!audio)
-    if (audio) {
-      audio.currentTime = 0
-      audio.volume = 0
-      audio.play().then(() => {
-        console.log("[v0] Enter sound playing successfully")
-        // Fade in over 200ms
-        enterFadeIntervalRef.current = fadeIn(audio, 0.25, 200)
-        currentlyPlayingEnterRef.current = audio
-      }).catch((err) => {
-        console.log("[v0] Enter sound failed:", err.message)
-      })
-    }
-    
-    // Cycle to next sound
+    const audio = enterSfxRef.current
+    if (!audio) return
+
+    if (enterFadeIntervalRef.current) clearInterval(enterFadeIntervalRef.current)
+    if (!audio.paused) fadeOut(audio, 200)
+
+    const index = (enterIndexRef.current % 5) + 1
     enterIndexRef.current = (enterIndexRef.current + 1) % 5
+    const base = typeof window !== "undefined" ? window.location.origin : ""
+    audio.src = `${base}/sounds/enter-${index}.mp3`
+    audio.currentTime = 0
+    audio.volume = 0
+    audio.play().then(() => {
+      enterFadeIntervalRef.current = fadeIn(audio, 0.25, 200)
+    }).catch(() => {})
   }, [isMuted, fadeIn, fadeOut])
 
   const playExit = useCallback(() => {
-    console.log("[v0] playExit called, isMuted:", isMuted)
     if (isMuted) return
-    
-    // Fade out currently playing exit sound if any
-    if (currentlyPlayingExitRef.current && !currentlyPlayingExitRef.current.paused) {
-      if (exitFadeIntervalRef.current) clearInterval(exitFadeIntervalRef.current)
-      fadeOut(currentlyPlayingExitRef.current, 200)
-    }
-    
-    const audio = exitSoundsRef.current[exitIndexRef.current]
-    console.log("[v0] Playing exit sound index:", exitIndexRef.current, "audio:", !!audio)
-    if (audio) {
-      audio.currentTime = 0
-      audio.volume = 0
-      audio.play().then(() => {
-        console.log("[v0] Exit sound playing successfully")
-        // Fade in over 200ms
-        exitFadeIntervalRef.current = fadeIn(audio, 0.25, 200)
-        currentlyPlayingExitRef.current = audio
-      }).catch((err) => {
-        console.log("[v0] Exit sound failed:", err.message)
-      })
-    }
-    
-    // Cycle to next sound
+    const audio = exitSfxRef.current
+    if (!audio) return
+
+    if (exitFadeIntervalRef.current) clearInterval(exitFadeIntervalRef.current)
+    if (!audio.paused) fadeOut(audio, 200)
+
+    const index = (exitIndexRef.current % 5) + 1
     exitIndexRef.current = (exitIndexRef.current + 1) % 5
+    const base = typeof window !== "undefined" ? window.location.origin : ""
+    audio.src = `${base}/sounds/exit-${index}.mp3`
+    audio.currentTime = 0
+    audio.volume = 0
+    audio.play().then(() => {
+      exitFadeIntervalRef.current = fadeIn(audio, 0.25, 200)
+    }).catch(() => {})
   }, [isMuted, fadeIn, fadeOut])
 
   return (
