@@ -32,9 +32,16 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
   const ambientRef = useRef<HTMLAudioElement | null>(null)
   const hasFadedInRef = useRef(false)
 
+  const getSoundsBase = useCallback(() => {
+    if (typeof window === "undefined") return ""
+    return (
+      (process.env.NEXT_PUBLIC_SOUNDS_BASE as string | undefined) ||
+      window.location.origin
+    )
+  }, [])
+
   useEffect(() => {
-    const base =
-      typeof window !== "undefined" ? window.location.origin : ""
+    const base = getSoundsBase()
     // Single SFX elements — no src until play (set in user gesture, like ambient’s first play)
     ambientRef.current = new Audio(`${base}/sounds/ambient.mp3`)
     ambientRef.current.loop = true
@@ -45,7 +52,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
       ambientRef.current?.pause()
       ambientRef.current = null
     }
-  }, [])
+  }, [getSoundsBase])
 
   const startAmbient = useCallback(() => {
     console.log("[v0] startAmbient called, hasFadedIn:", hasFadedInRef.current, "ambientRef:", !!ambientRef.current)
@@ -98,23 +105,23 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
 
   const playEnter = useCallback(() => {
     if (isMuted) return
-    const base = typeof window !== "undefined" ? window.location.origin : ""
+    const base = getSoundsBase()
     const index = (enterIndexRef.current % 5) + 1
     enterIndexRef.current = (enterIndexRef.current + 1) % 5
     const audio = new Audio(`${base}/sounds/enter-${index}.mp3`)
     audio.volume = 0.25
     audio.play().catch(() => {})
-  }, [isMuted])
+  }, [isMuted, getSoundsBase])
 
   const playExit = useCallback(() => {
     if (isMuted) return
-    const base = typeof window !== "undefined" ? window.location.origin : ""
+    const base = getSoundsBase()
     const index = (exitIndexRef.current % 5) + 1
     exitIndexRef.current = (exitIndexRef.current + 1) % 5
     const audio = new Audio(`${base}/sounds/exit-${index}.mp3`)
     audio.volume = 0.25
     audio.play().catch(() => {})
-  }, [isMuted])
+  }, [isMuted, getSoundsBase])
 
   return (
     <AudioContext.Provider value={{ isMuted, toggleMute, playEnter, playExit, startAmbient }}>
