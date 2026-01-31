@@ -191,6 +191,24 @@ export function CaveScene() {
         </p>
       </div>
 
+      {/* Contact button - top right, same style as Enter; right-[4.5rem] clears MuteButton */}
+      <div
+        className={`absolute top-8 right-[4.5rem] z-40 flex justify-end transition-all duration-700 ${
+          isLoaded && !activeSection
+            ? "opacity-100 translate-y-0"
+            : "opacity-0 -translate-y-4"
+        }`}
+      >
+        <button
+          type="button"
+          onClick={() => handleHotspotClick("contact")}
+          className="px-6 py-2.5 md:px-8 md:py-3 rounded-full border-2 border-ice-primary/40 text-ice-primary/70 hover:border-ice-primary hover:text-ice-primary hover:scale-105 active:scale-100 transition-all duration-300 text-sm md:text-base font-mono"
+          aria-label="Go to Contact"
+        >
+          Contact
+        </button>
+      </div>
+
       {/* Explore hint - subtle, fades quickly since hotspots are obvious */}
       <div
         className={`absolute bottom-24 left-1/2 -translate-x-1/2 z-20 transition-all duration-1000 ${
