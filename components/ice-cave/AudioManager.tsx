@@ -102,7 +102,8 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
   const tryOneSfxUrl = useCallback(
     (url: string): Promise<void> => {
       const ctx = sfxContextRef.current!
-      const mime = url.endsWith(".ogg") ? "audio/ogg" : "audio/mpeg"
+      const isOgg = url.endsWith(".ogg")
+      const mime = isOgg ? "audio/ogg; codecs=vorbis" : "audio/mpeg"
       return fetch(url).then((r) => {
         if (!r.ok) throw new Error(`HTTP ${r.status}`)
         return r.arrayBuffer()
@@ -118,7 +119,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
             gain.connect(ctx.destination)
             src.start(0)
           },
-          (decodeErr) => {
+          () => {
             const blob = new Blob([bufForBlob], { type: mime })
             const blobUrl = URL.createObjectURL(blob)
             const audio = new Audio(blobUrl)
@@ -139,8 +140,11 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
         console.warn("[SFX] No AudioContext")
         return
       }
-      tryOneSfxUrl(oggUrl).catch(() => tryOneSfxUrl(mp3Url)).catch((err) => {
-        console.error("[SFX] Failed to load (OGG and MP3):", err?.message ?? err)
+      tryOneSfxUrl(oggUrl).catch((oggErr) => {
+        console.warn("[SFX] OGG failed:", (oggErr as Error)?.message ?? oggErr)
+        return tryOneSfxUrl(mp3Url)
+      }).catch((mp3Err) => {
+        console.error("[SFX] MP3 failed:", (mp3Err as Error)?.message ?? mp3Err)
       })
     },
     [isMuted, tryOneSfxUrl]
