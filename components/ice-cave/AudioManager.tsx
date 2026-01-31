@@ -106,6 +106,10 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
       const mime = isOgg ? "audio/ogg; codecs=vorbis" : "audio/mpeg"
       return fetch(url).then((r) => {
         if (!r.ok) throw new Error(`HTTP ${r.status}`)
+        const ct = (r.headers.get("Content-Type") || "").toLowerCase()
+        if (!ct.includes("audio/")) {
+          throw new Error(`non-audio response (Content-Type: ${ct || "unknown"})`)
+        }
         return r.arrayBuffer()
       }).then((buf) => {
         const bufForBlob = buf.slice(0)

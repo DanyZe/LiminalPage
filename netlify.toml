@@ -21,12 +21,22 @@
   conditions = {Accept = "text/html"}
   force = false
 
-# Audio files - MP3 format with proper headers
+# Audio files - MP3
 [[headers]]
   for = "/sounds/*.mp3"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
     Content-Type = "audio/mpeg"
+    Accept-Ranges = "bytes"
+    Cross-Origin-Resource-Policy = "cross-origin"
+    Access-Control-Allow-Origin = "*"
+
+# Audio files - OGG
+[[headers]]
+  for = "/sounds/*.ogg"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+    Content-Type = "audio/ogg"
     Accept-Ranges = "bytes"
     Cross-Origin-Resource-Policy = "cross-origin"
     Access-Control-Allow-Origin = "*"
