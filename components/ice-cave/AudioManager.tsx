@@ -56,16 +56,11 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
   }, [getSoundsBase])
 
   const startAmbient = useCallback(() => {
-    console.log("[v0] startAmbient called, hasFadedIn:", hasFadedInRef.current, "ambientRef:", !!ambientRef.current)
     // Start ambient with 10s fade-in (only once, triggered by user action)
     if (!hasFadedInRef.current && ambientRef.current) {
       hasFadedInRef.current = true
-      
-      console.log("[v0] Attempting to play ambient audio")
-      ambientRef.current.play().then(() => {
-        console.log("[v0] Ambient audio playing successfully")
-      }).catch((err) => {
-        console.log("[v0] Ambient audio failed:", err.message)
+      ambientRef.current.play().catch((err) => {
+        console.warn("[Audio] Ambient failed:", err.message)
       })
 
       // Fade in over 10 seconds
@@ -104,86 +99,75 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     })
   }, [])
 
+  const tryOneSfxUrl = useCallback(
+    (url: string): Promise<void> => {
+      const ctx = sfxContextRef.current!
+      const mime = url.endsWith(".ogg") ? "audio/ogg" : "audio/mpeg"
+      return fetch(url).then((r) => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`)
+        return r.arrayBuffer()
+      }).then((buf) => {
+        const bufForBlob = buf.slice(0)
+        return ctx.decodeAudioData(buf).then(
+          (decoded) => {
+            const src = ctx.createBufferSource()
+            const gain = ctx.createGain()
+            gain.gain.value = 0.25
+            src.buffer = decoded
+            src.connect(gain)
+            gain.connect(ctx.destination)
+            src.start(0)
+          },
+          (decodeErr) => {
+            const blob = new Blob([bufForBlob], { type: mime })
+            const blobUrl = URL.createObjectURL(blob)
+            const audio = new Audio(blobUrl)
+            audio.volume = 0.25
+            return audio.play().then(() => {}).finally(() => URL.revokeObjectURL(blobUrl))
+          }
+        )
+      })
+    },
+    []
+  )
+
   const playSfx = useCallback(
-    (url: string) => {
-      if (isMuted) {
-        console.log("[SFX] skipped: muted")
-        return
-      }
+    (oggUrl: string, mp3Url: string) => {
+      if (isMuted) return
       const ctx = sfxContextRef.current
       if (!ctx) {
-        console.warn("[SFX] no AudioContext")
+        console.warn("[SFX] No AudioContext")
         return
       }
-      console.log("[SFX] fetch:", url)
-      fetch(url)
-        .then((r) => {
-          console.log("[SFX] response:", r.status, r.statusText, "Content-Type:", r.headers.get("Content-Type"), "Content-Length:", r.headers.get("Content-Length"))
-          if (!r.ok) throw new Error(`HTTP ${r.status} ${r.statusText}`)
-          return r.arrayBuffer()
-        })
-        .then((buf) => {
-          console.log("[SFX] buffer size:", buf.byteLength, "bytes")
-          const bufForBlob = buf.slice(0)
-          return ctx
-            .decodeAudioData(buf)
-            .then((decoded) => {
-              console.log("[SFX] decode OK, playing, duration:", decoded.duration.toFixed(2), "s")
-              const src = ctx.createBufferSource()
-              const gain = ctx.createGain()
-              gain.gain.value = 0.25
-              src.buffer = decoded
-              src.connect(gain)
-              gain.connect(ctx.destination)
-              src.start(0)
-            })
-            .catch((decodeErr) => {
-              console.warn("[SFX] decode failed, fallback to blob URL:", decodeErr?.message ?? decodeErr)
-              const blob = new Blob([bufForBlob], { type: "audio/mpeg" })
-              console.log("[SFX] blob size:", blob.size, "bytes")
-              const blobUrl = URL.createObjectURL(blob)
-              const audio = new Audio(blobUrl)
-              audio.volume = 0.25
-              audio.play().finally(() => URL.revokeObjectURL(blobUrl))
-            })
-        })
-        .catch((err) => {
-          console.error("[SFX] failed:", err?.message ?? err, err)
-        })
+      tryOneSfxUrl(oggUrl).catch(() => tryOneSfxUrl(mp3Url)).catch((err) => {
+        console.error("[SFX] Failed to load (OGG and MP3):", err?.message ?? err)
+      })
     },
-    [isMuted]
+    [isMuted, tryOneSfxUrl]
   )
 
   const playEnter = useCallback(() => {
-    console.log("[SFX] playEnter called, isMuted:", isMuted)
     if (isMuted) return
     if (!sfxContextRef.current) {
       sfxContextRef.current = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)()
       sfxContextRef.current.resume()
-      console.log("[SFX] AudioContext created")
     }
     const base = getSoundsBase()
     const index = (enterIndexRef.current % 5) + 1
     enterIndexRef.current = (enterIndexRef.current + 1) % 5
-    const url = `${base}/sounds/enter-${index}.mp3`
-    console.log("[SFX] enter URL:", url)
-    playSfx(url)
+    playSfx(`${base}/sounds/enter-${index}.ogg`, `${base}/sounds/enter-${index}.mp3`)
   }, [isMuted, getSoundsBase, playSfx])
 
   const playExit = useCallback(() => {
-    console.log("[SFX] playExit called, isMuted:", isMuted)
     if (isMuted) return
     if (!sfxContextRef.current) {
       sfxContextRef.current = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)()
       sfxContextRef.current.resume()
-      console.log("[SFX] AudioContext created")
     }
     const base = getSoundsBase()
     const index = (exitIndexRef.current % 5) + 1
     exitIndexRef.current = (exitIndexRef.current + 1) % 5
-    const url = `${base}/sounds/exit-${index}.mp3`
-    console.log("[SFX] exit URL:", url)
-    playSfx(url)
+    playSfx(`${base}/sounds/exit-${index}.ogg`, `${base}/sounds/exit-${index}.mp3`)
   }, [isMuted, getSoundsBase, playSfx])
 
   return (
