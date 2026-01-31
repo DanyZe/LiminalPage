@@ -98,32 +98,26 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     })
   }, [])
 
-  const tryOneSfxUrl = useCallback((url: string): Promise<void> => {
-    const audio = new Audio(url)
-    audio.volume = 0.25
-    return audio.play().then(() => {})
-  }, [])
-
-  const logServerResponse = useCallback((label: string, url: string) => {
-    fetch(url, { method: "HEAD" }).then((r) => {
-      const ct = r.headers.get("Content-Type") ?? "none"
-      console.warn(`[SFX] ${label} server response: ${r.status} Content-Type: ${ct}`)
-    }).catch(() => {})
-  }, [])
-
   const playSfx = useCallback(
     (oggUrl: string, mp3Url: string) => {
       if (isMuted) return
-      tryOneSfxUrl(oggUrl).catch((oggErr) => {
-        console.warn("[SFX] OGG failed:", (oggErr as Error)?.message ?? oggErr)
-        logServerResponse("OGG", oggUrl)
-        return tryOneSfxUrl(mp3Url)
-      }).catch((mp3Err) => {
-        console.error("[SFX] MP3 failed:", (mp3Err as Error)?.message ?? mp3Err)
-        logServerResponse("MP3", mp3Url)
-      })
+      const q = "?v=2"
+      const ogg = oggUrl + q
+      const mp3 = mp3Url + q
+      const audioOgg = new Audio(ogg)
+      const audioMp3 = new Audio(mp3)
+      audioOgg.volume = 0.25
+      audioMp3.volume = 0.25
+      const stopOther = (winner: HTMLAudioElement) => {
+        if (winner === audioOgg) audioMp3.pause()
+        else audioOgg.pause()
+      }
+      audioOgg.addEventListener("playing", () => stopOther(audioOgg), { once: true })
+      audioMp3.addEventListener("playing", () => stopOther(audioMp3), { once: true })
+      audioOgg.play().catch(() => {})
+      audioMp3.play().catch(() => {})
     },
-    [isMuted, tryOneSfxUrl, logServerResponse]
+    [isMuted]
   )
 
   const playEnter = useCallback(() => {
