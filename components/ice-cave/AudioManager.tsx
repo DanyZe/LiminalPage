@@ -104,17 +104,26 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     return audio.play().then(() => {})
   }, [])
 
+  const logServerResponse = useCallback((label: string, url: string) => {
+    fetch(url, { method: "HEAD" }).then((r) => {
+      const ct = r.headers.get("Content-Type") ?? "none"
+      console.warn(`[SFX] ${label} server response: ${r.status} Content-Type: ${ct}`)
+    }).catch(() => {})
+  }, [])
+
   const playSfx = useCallback(
     (oggUrl: string, mp3Url: string) => {
       if (isMuted) return
       tryOneSfxUrl(oggUrl).catch((oggErr) => {
         console.warn("[SFX] OGG failed:", (oggErr as Error)?.message ?? oggErr)
+        logServerResponse("OGG", oggUrl)
         return tryOneSfxUrl(mp3Url)
       }).catch((mp3Err) => {
         console.error("[SFX] MP3 failed:", (mp3Err as Error)?.message ?? mp3Err)
+        logServerResponse("MP3", mp3Url)
       })
     },
-    [isMuted, tryOneSfxUrl]
+    [isMuted, tryOneSfxUrl, logServerResponse]
   )
 
   const playEnter = useCallback(() => {
