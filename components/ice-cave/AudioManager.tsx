@@ -31,6 +31,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
 
   const ambientRef = useRef<HTMLAudioElement | null>(null)
   const hasFadedInRef = useRef(false)
+  const sfxContextRef = useRef<AudioContext | null>(null)
 
   const getSoundsBase = useCallback(() => {
     if (typeof window === "undefined") return ""
@@ -103,25 +104,51 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     })
   }, [])
 
+  const playSfx = useCallback(
+    (url: string) => {
+      if (isMuted) return
+      const ctx = sfxContextRef.current
+      if (!ctx) return
+      fetch(url)
+        .then((r) => r.arrayBuffer())
+        .then((buf) => ctx.decodeAudioData(buf))
+        .then((decoded) => {
+          const src = ctx.createBufferSource()
+          const gain = ctx.createGain()
+          gain.gain.value = 0.25
+          src.buffer = decoded
+          src.connect(gain)
+          gain.connect(ctx.destination)
+          src.start(0)
+        })
+        .catch(() => {})
+    },
+    [isMuted]
+  )
+
   const playEnter = useCallback(() => {
     if (isMuted) return
+    if (!sfxContextRef.current) {
+      sfxContextRef.current = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)()
+      sfxContextRef.current.resume()
+    }
     const base = getSoundsBase()
     const index = (enterIndexRef.current % 5) + 1
     enterIndexRef.current = (enterIndexRef.current + 1) % 5
-    const audio = new Audio(`${base}/sounds/enter-${index}.mp3`)
-    audio.volume = 0.25
-    audio.play().catch(() => {})
-  }, [isMuted, getSoundsBase])
+    playSfx(`${base}/sounds/enter-${index}.mp3`)
+  }, [isMuted, getSoundsBase, playSfx])
 
   const playExit = useCallback(() => {
     if (isMuted) return
+    if (!sfxContextRef.current) {
+      sfxContextRef.current = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)()
+      sfxContextRef.current.resume()
+    }
     const base = getSoundsBase()
     const index = (exitIndexRef.current % 5) + 1
     exitIndexRef.current = (exitIndexRef.current + 1) % 5
-    const audio = new Audio(`${base}/sounds/exit-${index}.mp3`)
-    audio.volume = 0.25
-    audio.play().catch(() => {})
-  }, [isMuted, getSoundsBase])
+    playSfx(`${base}/sounds/exit-${index}.mp3`)
+  }, [isMuted, getSoundsBase, playSfx])
 
   return (
     <AudioContext.Provider value={{ isMuted, toggleMute, playEnter, playExit, startAmbient }}>
