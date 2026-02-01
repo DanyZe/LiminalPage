@@ -93,16 +93,18 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
         </p>
       </div>
 
-      {/* Enter prompt - shows after loading completes */}
-      {isLoaded && (
+      {/* Enter prompt - space reserved so layout doesn't jump; button fades in */}
+      <div className="mt-8 h-12 flex items-center justify-center">
         <button
           type="button"
           onClick={handleEnterClick}
-          className="mt-8 px-8 py-3 rounded-full border-2 border-ice-primary/40 text-ice-primary/70 hover:border-ice-primary hover:text-ice-primary hover:scale-110 transition-all duration-300 text-base font-mono animate-pulse"
+          className={`px-8 py-3 rounded-full border-2 border-ice-primary/40 text-ice-primary/70 hover:border-ice-primary hover:text-ice-primary hover:scale-110 transition-[opacity,transform,border-color,color] duration-300 text-base font-mono ${
+            isLoaded ? "opacity-100 animate-pulse" : "opacity-0 pointer-events-none"
+          }`}
         >
           Enter
         </button>
-      )}
+      </div>
     </div>
   )
 }

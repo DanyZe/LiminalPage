@@ -31,10 +31,10 @@ const videos: VideoItem[] = [
   },
   {
     id: "3",
-    title: "Landscapes: Forest",
-    description: "Coming soon",
-    thumbnail: "/images/thumb-3.jpg",
-    embedUrl: "https://www.youtube.com/embed/PLACEHOLDER",
+    title: "Landscapes. Grove",
+    description: "Audiovisual exploration",
+    thumbnail: "https://img.youtube.com/vi/3u6K_FXFbQ8/maxresdefault.jpg",
+    embedUrl: "https://www.youtube.com/embed/3u6K_FXFbQ8",
     platform: "youtube",
   },
 ]
