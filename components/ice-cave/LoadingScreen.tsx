@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import { useAudio } from "./AudioManager"
 
 interface LoadingScreenProps {
@@ -11,7 +11,9 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
   const { startAmbient } = useAudio()
   const [progress, setProgress] = useState(0)
   const [isLoaded, setIsLoaded] = useState(false)
+  const [enterReveal, setEnterReveal] = useState(false)
   const [isExiting, setIsExiting] = useState(false)
+  const revealRafRef = useRef<number | null>(null)
 
   useEffect(() => {
     // Simulate loading progress
@@ -30,6 +32,18 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
 
     return () => clearInterval(interval)
   }, [])
+
+  useEffect(() => {
+    if (!isLoaded) return
+    revealRafRef.current = requestAnimationFrame(() => {
+      revealRafRef.current = requestAnimationFrame(() => {
+        setEnterReveal(true)
+      })
+    })
+    return () => {
+      if (revealRafRef.current != null) cancelAnimationFrame(revealRafRef.current)
+    }
+  }, [isLoaded])
 
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
@@ -93,13 +107,13 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
         </p>
       </div>
 
-      {/* Enter prompt - space reserved so layout doesn't jump; long smooth fade-in */}
+      {/* Enter prompt - space reserved; reveal delayed by 2 rAF so opacity transition runs */}
       <div className="mt-8 h-12 flex items-center justify-center">
         <button
           type="button"
           onClick={handleEnterClick}
-          className={`px-8 py-3 rounded-full border-2 border-ice-primary/40 text-ice-primary/70 hover:border-ice-primary hover:text-ice-primary hover:scale-110 text-base font-mono transition-[opacity,transform,border-color,color] duration-[1500ms] ease-out ${
-            isLoaded ? "opacity-100 animate-pulse" : "opacity-0 pointer-events-none"
+          className={`px-8 py-3 rounded-full border-2 border-ice-primary/40 text-ice-primary/70 hover:border-ice-primary hover:text-ice-primary hover:scale-110 text-base font-mono transition-[opacity,transform,border-color,color] duration-[2000ms] ease-out ${
+            enterReveal ? "opacity-100 animate-pulse" : "opacity-0 pointer-events-none"
           }`}
         >
           Enter

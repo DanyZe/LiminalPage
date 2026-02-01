@@ -10,6 +10,8 @@ interface AudioContextType {
   playEnter: () => void
   playExit: () => void
   startAmbient: () => void
+  fadeAmbientOut: (durationMs?: number) => void
+  fadeAmbientIn: (durationMs?: number) => void
 }
 
 const AudioContext = createContext<AudioContextType>({
@@ -18,6 +20,8 @@ const AudioContext = createContext<AudioContextType>({
   playEnter: () => {},
   playExit: () => {},
   startAmbient: () => {},
+  fadeAmbientOut: () => {},
+  fadeAmbientIn: () => {},
 })
 
 export function useAudio() {
@@ -31,6 +35,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
 
   const ambientRef = useRef<HTMLAudioElement | null>(null)
   const hasFadedInRef = useRef(false)
+  const ambientFadeIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   const getSoundsBase = useCallback(() => {
     if (typeof window === "undefined") return ""
@@ -82,6 +87,58 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
       }, stepDuration)
     }
   }, [])
+
+  const clearAmbientFade = useCallback(() => {
+    if (ambientFadeIntervalRef.current) {
+      clearInterval(ambientFadeIntervalRef.current)
+      ambientFadeIntervalRef.current = null
+    }
+  }, [])
+
+  const fadeAmbientOut = useCallback((durationMs = 800) => {
+    clearAmbientFade()
+    if (!ambientRef.current || isMuted) return
+    const el = ambientRef.current
+    const startVolume = el.volume
+    const steps = 40
+    const stepDuration = durationMs / steps
+    const volumeStep = startVolume / steps
+    let step = 0
+    ambientFadeIntervalRef.current = setInterval(() => {
+      step++
+      if (step >= steps || !ambientRef.current) {
+        clearAmbientFade()
+        if (ambientRef.current) ambientRef.current.volume = 0
+        return
+      }
+      if (ambientRef.current) {
+        ambientRef.current.volume = Math.max(0, startVolume - volumeStep * step)
+      }
+    }, stepDuration)
+  }, [isMuted, clearAmbientFade])
+
+  const fadeAmbientIn = useCallback((durationMs = 5000) => {
+    clearAmbientFade()
+    if (!ambientRef.current || isMuted) return
+    const targetVolume = 0.25
+    const steps = 100
+    const stepDuration = durationMs / steps
+    const volumeIncrement = targetVolume / steps
+    let step = 0
+    ambientRef.current.volume = 0
+    ambientRef.current.play().catch(() => {})
+    ambientFadeIntervalRef.current = setInterval(() => {
+      step++
+      if (step >= steps || !ambientRef.current) {
+        clearAmbientFade()
+        if (ambientRef.current) ambientRef.current.volume = targetVolume
+        return
+      }
+      if (ambientRef.current) {
+        ambientRef.current.volume = Math.min(volumeIncrement * step, targetVolume)
+      }
+    }, stepDuration)
+  }, [isMuted, clearAmbientFade])
 
   const toggleMute = useCallback(() => {
     setIsMuted((prev) => {
@@ -137,7 +194,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
   }, [isMuted, getSoundsBase, playSfx])
 
   return (
-    <AudioContext.Provider value={{ isMuted, toggleMute, playEnter, playExit, startAmbient }}>
+    <AudioContext.Provider value={{ isMuted, toggleMute, playEnter, playExit, startAmbient, fadeAmbientOut, fadeAmbientIn }}>
       {children}
     </AudioContext.Provider>
   )

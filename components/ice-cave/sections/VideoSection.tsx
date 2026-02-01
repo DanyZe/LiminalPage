@@ -1,7 +1,8 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect, useRef } from "react"
 import { Play } from "lucide-react"
+import { useAudio } from "../AudioManager"
 
 interface VideoItem {
   id: string
@@ -41,6 +42,26 @@ const videos: VideoItem[] = [
 
 export function VideoSection() {
   const [activeVideo, setActiveVideo] = useState<VideoItem | null>(null)
+  const didFadeOutRef = useRef(false)
+  const { fadeAmbientOut, fadeAmbientIn } = useAudio()
+
+  useEffect(() => {
+    if (activeVideo) {
+      didFadeOutRef.current = true
+      fadeAmbientOut(800)
+    } else if (didFadeOutRef.current) {
+      didFadeOutRef.current = false
+      fadeAmbientIn(5000)
+    }
+  }, [activeVideo, fadeAmbientOut, fadeAmbientIn])
+
+  useEffect(() => {
+    return () => {
+      if (didFadeOutRef.current) {
+        fadeAmbientIn(5000)
+      }
+    }
+  }, [fadeAmbientIn])
 
   return (
     <div className="w-full max-w-5xl mx-auto px-4">
