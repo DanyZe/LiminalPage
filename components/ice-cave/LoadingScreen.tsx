@@ -93,12 +93,12 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
         </p>
       </div>
 
-      {/* Enter prompt - space reserved so layout doesn't jump; button fades in */}
+      {/* Enter prompt - space reserved so layout doesn't jump; long smooth fade-in */}
       <div className="mt-8 h-12 flex items-center justify-center">
         <button
           type="button"
           onClick={handleEnterClick}
-          className={`px-8 py-3 rounded-full border-2 border-ice-primary/40 text-ice-primary/70 hover:border-ice-primary hover:text-ice-primary hover:scale-110 transition-[opacity,transform,border-color,color] duration-300 text-base font-mono ${
+          className={`px-8 py-3 rounded-full border-2 border-ice-primary/40 text-ice-primary/70 hover:border-ice-primary hover:text-ice-primary hover:scale-110 text-base font-mono transition-[opacity,transform,border-color,color] duration-[1500ms] ease-out ${
             isLoaded ? "opacity-100 animate-pulse" : "opacity-0 pointer-events-none"
           }`}
         >

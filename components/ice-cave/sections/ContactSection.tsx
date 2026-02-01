@@ -49,7 +49,7 @@ export function ContactSection() {
           Liminal - A Short Nature Documentary
         </p>
         <p className="text-ice-light/30 text-xs">
-          Co-created by Dany Zernitsky & Hila Manor | Produced by Jonathan Jacob
+          Co-created by Dany Zernitsky & Hila Manor | Produced by Yonatan Jakob
         </p>
       </div>
     </div>

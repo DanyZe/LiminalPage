@@ -23,7 +23,7 @@ const crewMembers: CrewMember[] = [
     image: "/images/team/hila.jpg",
   },
   {
-    name: "Jonathan Jacob",
+    name: "Yonatan Jakob",
     role: "Producer",
     bio: "Experienced producer with a passion for bringing meaningful stories to life.",
     image: "/images/team/yonatan.jpg",
