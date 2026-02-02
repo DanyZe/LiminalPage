@@ -48,6 +48,14 @@ const videos: VideoItem[] = [
     platform: "youtube",
     tag: "Uses only electronic samples.",
   },
+  {
+    id: "5",
+    title: "An imaginary line between sky and water",
+    description: "A meditative experimental piece.",
+    thumbnail: "https://vumbnail.com/1132745632.jpg",
+    embedUrl: "https://player.vimeo.com/video/1132745632",
+    platform: "vimeo",
+  },
 ]
 
 export function VideoSection() {
