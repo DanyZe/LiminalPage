@@ -6,9 +6,9 @@ const facts = [
   {
     icon: Thermometer,
     stat: "+1.1°C",
-    label: "Global temperature rise since pre-industrial times",
-    source: "IPCC 2023",
-    link: "https://www.ipcc.ch/report/ar6/syr/",
+    label: "Global temperature rise since pre-industrial times (2011–2020)",
+    source: "IPCC AR6 WG1 2021",
+    link: "https://www.ipcc.ch/report/ar6/wg1/chapter/summary-for-policymakers/",
     gradient: "from-orange-950/50 via-red-950/40 to-red-900/30",
     iconColor: "text-orange-300",
   },
