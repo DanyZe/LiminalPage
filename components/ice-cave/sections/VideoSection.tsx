@@ -18,7 +18,7 @@ const videos: VideoItem[] = [
   {
     id: "1",
     title: "Pitch",
-    description: "Our vision for Liminal.",
+    description: "The vision and intent behind Liminal.",
     thumbnail: "https://img.youtube.com/vi/1OAToIFbLaA/maxresdefault.jpg",
     embedUrl: "https://www.youtube.com/embed/1OAToIFbLaA",
     platform: "youtube",
@@ -26,7 +26,7 @@ const videos: VideoItem[] = [
   {
     id: "2",
     title: "Landscapes: Dead Sea",
-    description: "Audiovisual exploration of the Dead Sea.",
+    description: "Audiovisual sketch of the Dead Sea.",
     thumbnail: "https://img.youtube.com/vi/ZdkOOmTE3Aw/maxresdefault.jpg",
     embedUrl: "https://www.youtube.com/embed/ZdkOOmTE3Aw",
     platform: "youtube",
@@ -34,7 +34,7 @@ const videos: VideoItem[] = [
   {
     id: "3",
     title: "Landscapes. Grove",
-    description: "Audiovisual exploration of trees, groves and greenery.",
+    description: "Audiovisual sketch of groves and greenery.",
     thumbnail: "https://img.youtube.com/vi/3u6K_FXFbQ8/maxresdefault.jpg",
     embedUrl: "https://www.youtube.com/embed/3u6K_FXFbQ8",
     platform: "youtube",
@@ -42,7 +42,7 @@ const videos: VideoItem[] = [
   {
     id: "4",
     title: "Electric Nature",
-    description: "Electronic samples only—electromagnetic and digital textures on field footage.",
+    description: "Electronic samples only—no field ambience.",
     thumbnail: "https://img.youtube.com/vi/vcYqadsAe2Y/maxresdefault.jpg",
     embedUrl: "https://www.youtube.com/embed/vcYqadsAe2Y",
     platform: "youtube",
