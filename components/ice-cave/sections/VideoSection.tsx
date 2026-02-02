@@ -127,11 +127,11 @@ export function VideoSection() {
               onClick={() => setActiveVideo(video)}
               className="group text-left rounded-xl overflow-hidden bg-cave-deep/50 border border-ice-primary/10 hover:border-ice-primary/30 transition-all duration-500"
             >
-              <div className="relative aspect-video overflow-hidden">
+              <div className="relative aspect-video w-full overflow-hidden bg-cave-dark border-b border-ice-primary/10">
                 <img
                   src={video.thumbnail || "/placeholder.svg"}
                   alt={video.title}
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  className="absolute inset-0 h-full w-full object-cover object-center transition-transform duration-700 group-hover:scale-105"
                 />
                 <div className="absolute inset-0 bg-cave-dark/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                   <div className="w-16 h-16 rounded-full bg-ice-primary/90 flex items-center justify-center">
