@@ -35,11 +35,11 @@ const hotspots: HotspotData[] = [
     color: "blue", 
     animDelay: 0,
     mobileX: 25, 
-    mobileY: 62,
+    mobileY: 64,
   },
   { 
     id: "intent", 
-    x: 50, y: 38, 
+    x: 52, y: 41, 
     label: "Letter of Intent", 
     size: 75, 
     color: "indigo", 

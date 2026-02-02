@@ -9,14 +9,14 @@ export function IntentSection() {
         Letter of Intent
       </h2>
 
-      {/* Poster Image - zoomed out slightly so borders aren't clipped */}
-      <div className="mb-4 rounded-xl overflow-hidden border border-cyan-500/20 max-w-[280px] mx-auto p-3 bg-cave-dark/30 flex items-center justify-center">
+      {/* Poster Image - previous box with white bg and zoomed out slightly */}
+      <div className="mb-4 rounded-xl overflow-hidden border border-cyan-500/20 max-w-xs mx-auto bg-white p-2 flex items-center justify-center">
         <Image
           src="/images/liminal-poster.png"
           alt="Liminal - A short nature documentary poster"
           width={300}
           height={400}
-          className="w-[90%] h-auto object-contain"
+          className="w-[92%] h-auto object-contain"
         />
       </div>
 
