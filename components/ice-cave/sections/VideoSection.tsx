@@ -17,19 +17,19 @@ interface VideoItem {
 const videos: VideoItem[] = [
   {
     id: "1",
-    title: "Pitch",
-    description: "The vision and intent behind Liminal.",
-    thumbnail: "https://img.youtube.com/vi/1OAToIFbLaA/maxresdefault.jpg",
-    embedUrl: "https://www.youtube.com/embed/1OAToIFbLaA",
-    platform: "youtube",
-  },
-  {
-    id: "2",
     title: "Landscapes: Dead Sea",
     description: "Audiovisual sketch of the Dead Sea.",
     thumbnail: "https://img.youtube.com/vi/ZdkOOmTE3Aw/maxresdefault.jpg",
     embedUrl: "https://www.youtube.com/embed/ZdkOOmTE3Aw",
     platform: "youtube",
+  },
+  {
+    id: "2",
+    title: "An imaginary line between sky and water",
+    description: "A meditative experimental piece.",
+    thumbnail: "https://vumbnail.com/1132745632.jpg",
+    embedUrl: "https://player.vimeo.com/video/1132745632",
+    platform: "vimeo",
   },
   {
     id: "3",
@@ -50,11 +50,11 @@ const videos: VideoItem[] = [
   },
   {
     id: "5",
-    title: "An imaginary line between sky and water",
-    description: "A meditative experimental piece.",
-    thumbnail: "https://vumbnail.com/1132745632.jpg",
-    embedUrl: "https://player.vimeo.com/video/1132745632",
-    platform: "vimeo",
+    title: "Pitch",
+    description: "The vision and intent behind Liminal.",
+    thumbnail: "https://img.youtube.com/vi/1OAToIFbLaA/maxresdefault.jpg",
+    embedUrl: "https://www.youtube.com/embed/1OAToIFbLaA",
+    platform: "youtube",
   },
 ]
 
