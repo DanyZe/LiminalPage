@@ -22,29 +22,28 @@ interface HotspotData {
   tabletY?: number
   mobileX?: number
   mobileY?: number
+  accent?: boolean
 }
 
 // Hotspots with responsive positioning
 const hotspots: HotspotData[] = [
   { 
     id: "videos", 
-    x: 40, y: 55, 
+    x: 40, y: 60, 
     label: "Our Work", 
     size: 85, 
     color: "blue", 
     animDelay: 0,
-    // Mobile: move left and lower by a grid step
     mobileX: 25, 
     mobileY: 62,
   },
   { 
     id: "intent", 
-    x: 53, y: 43, 
+    x: 50, y: 38, 
     label: "Letter of Intent", 
     size: 75, 
     color: "indigo", 
     animDelay: 0.8,
-    // Mobile: lower by a grid step
     mobileX: 58,
     mobileY: 48,
   },
@@ -55,9 +54,9 @@ const hotspots: HotspotData[] = [
     size: 70, 
     color: "blue", 
     animDelay: 1.6,
-    // Tablet/Mobile: move even lower
     tabletY: 82,
     mobileY: 83,
+    accent: true,
   },
   { 
     id: "contact", 
@@ -66,9 +65,9 @@ const hotspots: HotspotData[] = [
     size: 68, 
     color: "indigo", 
     animDelay: 1.2,
-    // Tablet/Mobile: move even lower
     tabletY: 82,
     mobileY: 83,
+    accent: true,
   },
   { 
     id: "ice-info", 
@@ -77,10 +76,9 @@ const hotspots: HotspotData[] = [
     size: 72, 
     color: "cyan", 
     animDelay: 0.4,
-    // Tablet: move right from header
     tabletX: 40,
-    // Mobile: lower
     mobileY: 18,
+    accent: true,
   },
 ]
 

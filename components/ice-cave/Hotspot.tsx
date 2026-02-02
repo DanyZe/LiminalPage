@@ -16,6 +16,7 @@ interface HotspotProps {
   tabletY?: number
   mobileX?: number
   mobileY?: number
+  accent?: boolean
   onClick: (id: string) => void
 }
 
@@ -79,10 +80,14 @@ export function Hotspot({
   tabletY,
   mobileX,
   mobileY,
+  accent = false,
   onClick,
 }: HotspotProps) {
   const [isHovered, setIsHovered] = useState(false)
   const colorScheme = colorVariants[color as keyof typeof colorVariants] || colorVariants.cyan
+  const glowOpacity = accent ? (isHovered ? 0.95 : 0.75) : (isHovered ? 0.9 : 0.6)
+  const labelGlow = accent ? "0 0 6px" : "0 0 4px"
+  const labelOpacity = accent ? 0.95 : 0.9
   
   // Use CSS custom properties for responsive positioning
   const positionStyle = {
@@ -122,7 +127,7 @@ export function Hotspot({
       }}
       aria-label={label}
     >
-      {/* Ambient glow - soft and radiant */}
+      {/* Ambient glow - soft and radiant; slightly stronger when accent */}
       <div
         className="absolute rounded-full animate-soft-breathe transition-all duration-700"
         style={{
@@ -133,7 +138,7 @@ export function Hotspot({
           background: `radial-gradient(circle, ${isHovered ? colorScheme.glowHover : colorScheme.glow} 0%, transparent 70%)`,
           animationDelay: `${animDelay}s`,
           filter: "blur(16px)",
-          opacity: isHovered ? 0.9 : 0.6,
+          opacity: glowOpacity,
         }}
       />
 
@@ -303,8 +308,8 @@ export function Hotspot({
             border: `1px solid ${colorScheme.labelBorder}`,
             textShadow: isHovered 
               ? `0 0 8px ${colorScheme.glow}, 0 0 12px ${colorScheme.glow}`
-              : `0 0 4px ${colorScheme.glow}`,
-            opacity: isHovered ? 1 : 0.9,
+              : `${labelGlow} ${colorScheme.glow}`,
+            opacity: isHovered ? 1 : labelOpacity,
             letterSpacing: isHovered ? "0.2em" : "0.15em",
           }}
         >
