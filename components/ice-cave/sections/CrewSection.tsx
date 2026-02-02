@@ -12,14 +12,14 @@ interface CrewMember {
 const crewMembers: CrewMember[] = [
   {
     name: "Dany Zernitsky",
-    role: "Co-Creator",
-    bio: "Sound Designer, musician, exploring the intersection of acoustics and human experience.",
+    role: "Sound Designer // Musician",
+    bio: "Exploring the intersection of sonar and human experience.",
     image: "/images/team/dany.jpg",
   },
   {
     name: "Hila Manor",
-    role: "Co-Creator",
-    bio: "Filmmaker, animator, focused on environmental narratives and immersive storytelling.",
+    role: "Filmmaker // Animator",
+    bio: "Focused on environmental narratives and immersive storytelling.",
     image: "/images/team/hila.jpg",
   },
   {

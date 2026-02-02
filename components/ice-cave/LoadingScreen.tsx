@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState, useRef } from "react"
+import { useEffect, useState } from "react"
 import { useAudio } from "./AudioManager"
 
 interface LoadingScreenProps {
@@ -13,7 +13,6 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
   const [isLoaded, setIsLoaded] = useState(false)
   const [enterReveal, setEnterReveal] = useState(false)
   const [isExiting, setIsExiting] = useState(false)
-  const revealRafRef = useRef<number | null>(null)
 
   useEffect(() => {
     // Simulate loading progress
@@ -35,14 +34,8 @@ export function LoadingScreen({ onComplete }: LoadingScreenProps) {
 
   useEffect(() => {
     if (!isLoaded) return
-    revealRafRef.current = requestAnimationFrame(() => {
-      revealRafRef.current = requestAnimationFrame(() => {
-        setEnterReveal(true)
-      })
-    })
-    return () => {
-      if (revealRafRef.current != null) cancelAnimationFrame(revealRafRef.current)
-    }
+    const t = setTimeout(() => setEnterReveal(true), 500)
+    return () => clearTimeout(t)
   }, [isLoaded])
 
   useEffect(() => {

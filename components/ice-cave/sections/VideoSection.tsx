@@ -11,6 +11,7 @@ interface VideoItem {
   thumbnail: string
   embedUrl: string
   platform: "vimeo" | "youtube"
+  tag?: string
 }
 
 const videos: VideoItem[] = [
@@ -33,10 +34,19 @@ const videos: VideoItem[] = [
   {
     id: "3",
     title: "Landscapes. Grove",
-    description: "Audiovisual exploration",
+    description: "Audiovisual exploration of trees, groves and greenery.",
     thumbnail: "https://img.youtube.com/vi/3u6K_FXFbQ8/maxresdefault.jpg",
     embedUrl: "https://www.youtube.com/embed/3u6K_FXFbQ8",
     platform: "youtube",
+  },
+  {
+    id: "4",
+    title: "Landscapes. Grove (electronic)",
+    description: "Electromagnetic recordings and digital textures layered on field footage of nature and infrastructure.",
+    thumbnail: "https://img.youtube.com/vi/vcYqadsAe2Y/maxresdefault.jpg",
+    embedUrl: "https://www.youtube.com/embed/vcYqadsAe2Y",
+    platform: "youtube",
+    tag: "Uses only electronic samples — no field ambience",
   },
 ]
 
@@ -93,7 +103,12 @@ export function VideoSection() {
           <h3 className="font-serif text-xl text-ice-white mt-4">
             {activeVideo.title}
           </h3>
-          <p className="text-ice-light/60 text-sm">{activeVideo.description}</p>
+          {activeVideo.tag && (
+            <p className="text-ice-primary/90 text-xs font-mono uppercase tracking-wider mt-2">
+              {activeVideo.tag}
+            </p>
+          )}
+          <p className="text-ice-light/60 text-sm mt-1">{activeVideo.description}</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -117,6 +132,11 @@ export function VideoSection() {
                 </div>
               </div>
               <div className="p-4">
+                {video.tag && (
+                  <p className="text-ice-primary/90 text-xs font-mono uppercase tracking-wider mb-1.5">
+                    {video.tag}
+                  </p>
+                )}
                 <h3 className="font-serif text-lg text-ice-white mb-1">
                   {video.title}
                 </h3>

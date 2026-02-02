@@ -74,12 +74,9 @@ const keyPoints = [
 export function IceInfoSection() {
   return (
     <div className="w-full max-w-5xl mx-auto px-4">
-      <h2 className="font-serif text-3xl md:text-4xl text-ice-white mb-3 text-center">
+      <h2 className="font-serif text-3xl md:text-4xl text-ice-white mb-8 text-center">
         The Vanishing Ice
       </h2>
-      <p className="text-ice-light/60 text-center mb-8 text-sm max-w-2xl mx-auto">
-        Real Facts:
-      </p>
 
       {/* Facts Grid - 2x2 layout */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-3xl mx-auto">
